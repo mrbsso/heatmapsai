@@ -1,98 +1,33 @@
+
 <!DOCTYPE html>
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HeatmapsAI Demo</title>
+<title>HeatmapsAI</title>
 <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; text-align:center; background:#f9f9f9; }
-    header { background:#222; color:white; padding:20px; }
-    h1 { margin:0; }
-    p { color:#ddd; }
-    .container { margin:30px auto; max-width:900px; }
-    input[type="text"] { width:70%; padding:10px; font-size:16px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc; }
-    button { padding:10px 20px; font-size:16px; border:none; border-radius:5px; background:#e63946; color:white; cursor:pointer; margin:5px; }
-    button:hover { background:#d62828; }
-    #heatmapContainer { width:100%; height:500px; margin-top:20px; position:relative; border:1px solid #ccc; }
-    .pricing { display:flex; justify-content:center; gap:20px; margin:50px auto; max-width:800px; }
-    .plan { background:white; border:1px solid #ddd; border-radius:10px; padding:20px; width:300px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
-    .plan h2 { margin-top:0; }
-    .price { font-size:24px; color:#e63946; margin:15px 0; }
-    footer { margin-top:50px; padding:20px; background:#222; color:white; }
+  body { font-family: Arial; text-align: center; margin:0; padding:0; background:#f9f9f9; }
+  #heatmapContainer { width:80%; height:500px; margin:20px auto; border:1px solid #ccc; position:relative; }
 </style>
 </head>
 <body>
+<h1>🔥 HeatmapsAI Dashboard</h1>
+<input type="text" id="siteUrl" placeholder="أدخل رابط الموقع">
+<button onclick="loadHeatmap()">عرض Heatmap</button>
+<div id="heatmapContainer"></div>
 
-<header>
-    <h1>🔥 HeatmapsAI</h1>
-    <p>تحليلات الزوار وخريطة النقرات لموقعك</p>
-</header>
-
-<div class="container">
-    <h2>جرب الخريطة الحرارية على موقعك</h2>
-    <input type="text" id="siteUrl" placeholder="أدخل رابط الموقع (مثال: https://example.com)">
-    <button onclick="loadHeatmap()">عرض Heatmap</button>
-    <div id="heatmapContainer"></div>
-</div>
-
-<h2>خطط الاستخدام</h2>
-<div class="pricing">
-    <div class="plan">
-        <h2>الخطة المجانية</h2>
-        <p class="price">0$ / شهر</p>
-        <p>✔ 1000 زيارة شهريًا</p>
-        <p>✔ خريطة نقرات أساسية</p>
-        <p>✔ تقرير أسبوعي</p>
-        <button>جرب الآن</button>
-    </div>
-    <div class="plan">
-        <h2>الخطة المدفوعة</h2>
-        <p class="price">19$ / شهر</p>
-        <p>✔ زيارات غير محدودة</p>
-        <p>✔ خريطة نقرات متقدمة</p>
-        <p>✔ تقارير يومية</p>
-        <p>✔ دعم مخصص</p>
-        <button>ابدأ الآن</button>
-    </div>
-</div>
-
-<footer>
-    <p>© 2025 HeatmapsAI - جميع الحقوق محفوظة</p>
-</footer>
-
-<!-- مكتبة Heatmap.js -->
 <script src="https://cdn.jsdelivr.net/npm/heatmap.js@2.0.5/build/heatmap.min.js"></script>
 <script>
-const heatmapInstance = h337.create({
-    container: document.getElementById('heatmapContainer'),
-    radius: 20,
-    maxOpacity: 0.6,
-    minOpacity: 0,
-    blur: 0.85
-});
+const heatmap = h337.create({ container: document.getElementById('heatmapContainer'), radius:20 });
 
-// محاكاة بيانات نقرات عشوائية قبل ربط Backend
-function generateRandomClicks(count=200) {
-    const container = document.getElementById('heatmapContainer');
-    const width = container.offsetWidth;
-    const height = container.offsetHeight;
-    const data = [];
-    for(let i=0;i<count;i++){
-        data.push({ x: Math.floor(Math.random()*width), y: Math.floor(Math.random()*height), value:1 });
-    }
-    return data;
-}
-
-function loadHeatmap() {
-    const url = document.getElementById('siteUrl').value;
-    if(!url) { alert("ادخل رابط الموقع"); return; }
-
-    // مؤقت: استخدام بيانات عشوائية لمحاكاة Heatmap
-    const data = generateRandomClicks();
-    heatmapInstance.setData({ max:10, data: data });
-    alert("✅ تم توليد Heatmap تجريبي لموقعك: " + url);
+function loadHeatmap(){
+  const url = document.getElementById('siteUrl').value;
+  fetch(`https://YOUR_BACKEND_URL/clicks?page_url=${encodeURIComponent(url)}`)
+    .then(res=>res.json())
+    .then(data=>{
+      const points = data.map(c=>({x:c.x, y:c.y, value:1}));
+      heatmap.setData({ max:10, data: points });
+    });
 }
 </script>
-
 </body>
 </html>
